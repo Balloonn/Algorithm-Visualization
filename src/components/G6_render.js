@@ -1,10 +1,10 @@
 import G6 from '@antv/g6';
-import DataGraph from './data/dataGraph';
 
-const G6_render = (data, id) => {
+const G6_render = (data, id, dataStructure) => {
 
       let nodeCount = data.nodes.length;
       let edgeCount = data.edges.length;
+
         G6.registerBehavior('click-add-edge', {
           getEvents() {
             return {
@@ -41,7 +41,11 @@ const G6_render = (data, id) => {
                 id: this.edge2._cfg.id
               });
 
-              console.log(DataGraph.state);
+              dataStructure.addEdge(this.edge._cfg.source._cfg.id,this.edge._cfg.target._cfg.id,1);
+              dataStructure.addEdge(this.edge._cfg.target._cfg.id,this.edge._cfg.source._cfg.id,1);
+
+              console.log(data)
+              console.log(dataStructure)
               this.edge = null;
               this.addingEdge = false;
             } else {
@@ -74,7 +78,7 @@ const G6_render = (data, id) => {
           onEdgeClick(ev) {
             const currentEdge = ev.item;
             // 拖拽过程中，点击会点击到新增的边上
-            if (this.addingEdge && this.edge == currentEdge) {
+            if (this.addingEdge && this.edge === currentEdge) {
               graph.removeItem(this.edge);
               graph.removeItem(this.edge2);
               edgeCount-=2;
@@ -91,8 +95,7 @@ const G6_render = (data, id) => {
           };
         },
         onClick(ev) {
-          const graph = this.graph;
-          const node = this.graph.addItem('node', {
+          this.graph.addItem('node', {
             x: ev.canvasX,
             y: ev.canvasY,
             id: `${nodeCount}`, // 生成唯一的 id
@@ -105,8 +108,10 @@ const G6_render = (data, id) => {
             edges: [],
             label: `${nodeCount}`,
           })
+          dataStructure.addNode(nodeCount);
           nodeCount++;
-          console.log(DataGraph.state);
+          console.log(data);
+          console.log(dataStructure)
         }
       });
 
