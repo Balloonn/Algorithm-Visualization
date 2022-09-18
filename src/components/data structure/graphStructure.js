@@ -94,7 +94,7 @@ export class GraphStructure{
         
     // }
 
-    // find (x, p) {
+    // find (x, p) { 
     //     if(p[x] !== x) {
     //         p[x] = find(p[x], p);
     //     }
