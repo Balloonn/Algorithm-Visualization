@@ -119,7 +119,7 @@ const G6_render = (data, id, dataStructure) => {
         container: `${id}`, // 指定图画布的容器 id，与第 9 行的容器对应
         // 画布宽高
         width: 1280,
-        height: 720,
+        height: 960,
         fitViewPadding: [20, 50, 50, 20],
         modes: {
           default:['drag-node', 'click-select'],

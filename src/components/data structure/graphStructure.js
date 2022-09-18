@@ -83,5 +83,22 @@ export class GraphStructure{
             }
         }
     }
+
+    // kruskal () {
+    //     let nodes = this.nodes;
+    //     let cnt = 0;
+    //     let p = [];
+    //     for(let i = 0; i < nodes.length; i ++) {
+    //         p[nodes[i].id] = nodes[i].id;
+    //     }
+        
+    // }
+
+    // find (x, p) {
+    //     if(p[x] !== x) {
+    //         p[x] = find(p[x], p);
+    //     }
+    //     return p[x];
+    // }
 }
 
