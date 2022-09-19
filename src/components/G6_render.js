@@ -153,6 +153,7 @@ const G6_render = (data, id, dataStructure) => {
         const value = e.target.value;
         graph.setMode(value);
       })
+
 }
 
 export default G6_render
