@@ -36,28 +36,29 @@ export class GraphStructure{
         }
     }
 
-    dfs_init (id) {
+    dfs_init (id, ans) {
         let st = [];
-        this.dfs(id, st);
+        this.dfs(id, st, ans);
     }
 
-    dfs(id, st) {
+    dfs(id, st, ans) {
+        ans.push(parseInt(id));
         st[id] = true;
         let node = null;
         for(let i = 0; i < this.nodes.length; i ++) {
-            if(id === this.nodes[i].id) {
+            if(id == this.nodes[i].id) {
                 node = this.nodes[i];
             }
         }
 
         for(let i = 0; i < node.adjList.length; i ++) {
             if(!st[node.adjList[i]]) {
-                this.dfs(node.adjList[i], st);
+                this.dfs(node.adjList[i], st, ans);
             }
         }
     }
 
-    bfs (id) {
+    bfs (id, ans) {
         let queue = [];
         let st = [];
         queue.push(id);
@@ -65,13 +66,11 @@ export class GraphStructure{
 
         while(queue.length > 0) {
             let curid = queue[0];
-            console.log(curid);
-            queue.reverse();
-            queue.pop()
-            queue.reverse();
+            ans.push(parseInt(curid))
+            queue.splice(0,1);
             let node = null;
             for(let i = 0; i < this.nodes.length; i ++) {
-                if(curid === this.nodes[i].id) {
+                if(curid == this.nodes[i].id) {
                     node = this.nodes[i];
                 }
             }

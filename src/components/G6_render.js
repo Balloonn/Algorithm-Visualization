@@ -30,22 +30,40 @@ const G6_render = (data, id, dataStructure) => {
                 source: model.id
               }); 
               
-              data.edges.push({
-                source: this.edge._cfg.source._cfg.id,
-                target: this.edge._cfg.target._cfg.id,
-                id: this.edge._cfg.id
-              });
-              data.edges.push({
-                source: this.edge2._cfg.source._cfg.id,
-                target: this.edge2._cfg.target._cfg.id,
-                id: this.edge2._cfg.id
-              });
-
-              dataStructure.addEdge(this.edge._cfg.source._cfg.id,this.edge._cfg.target._cfg.id,1);
-              dataStructure.addEdge(this.edge._cfg.target._cfg.id,this.edge._cfg.source._cfg.id,1);
-
-              console.log(data)
-              console.log(dataStructure)
+              if(this.edge._cfg.source._cfg.id != this.edge._cfg.target._cfg.id)
+              {
+                let flag1 = true, flag2 = true;
+                for(let i = 0; i < data.edges.length; i ++)
+                {
+                  if(data.edges[i].source == this.edge._cfg.source._cfg.id && data.edges[i].target === this.edge._cfg.target._cfg.id) {
+                    flag1 = false;
+                  }
+                  
+                  if(data.edges[i].target == this.edge._cfg.source._cfg.id && data.edges[i].source === this.edge._cfg.target._cfg.id) {
+                    flag2 = false;
+                  }
+                }
+                
+                if(flag1) {
+                  data.edges.push({
+                    source: this.edge._cfg.source._cfg.id,
+                    target: this.edge._cfg.target._cfg.id,
+                    id: this.edge._cfg.id
+                  });
+                  dataStructure.addEdge(this.edge._cfg.source._cfg.id,this.edge._cfg.target._cfg.id,1);
+                }
+                
+                if(flag2) {
+                  data.edges.push({
+                    source: this.edge._cfg.target._cfg.id,
+                    target: this.edge._cfg.source._cfg.id,
+                    id: this.edge2._cfg.id
+                  });
+                  dataStructure.addEdge(this.edge._cfg.target._cfg.id,this.edge._cfg.source._cfg.id,1);
+                }
+                  
+              }
+              
               this.edge = null;
               this.addingEdge = false;
             } else {
@@ -115,6 +133,93 @@ const G6_render = (data, id, dataStructure) => {
         }
       });
 
+      G6.registerBehavior('click-delete-node', {
+        getEvents() {
+          return {
+            'node:click': 'onClick'
+          };
+        },
+        onClick(ev) {
+          const node = ev.item;
+          const model = node.getModel();
+
+          for(let i = 0; i < data.nodes.length; i ++) {
+            if(model.id == data.nodes[i].id) {
+              data.nodes.splice(i,1);
+            }
+          }
+          for(let i = 0; i < dataStructure.nodes.length; i ++) {
+            if(model.id == dataStructure.nodes[i].id) {
+              dataStructure.nodes.splice(i,1);
+            }
+          }
+          
+          for(let i = 0; i < data.edges.length; i ++) {
+            if(model.id == data.edges[i].source || model.id == data.edges[i].target) {
+              data.edges.splice(i,1);
+              i--;
+            }
+          }
+          for(let i = 0; i < dataStructure.nodes.length; i ++) {
+            let node = dataStructure.nodes[i];
+            if(node.id == model.id) {
+              dataStructure.nodes.splice(i,1);
+            }
+            else {
+              for(let j = 0; j < node.adjList.length; j ++) {
+                if(node.adjList[j] == model.id) {
+                  node.adjList.splice(j,1);
+                }
+              }
+            }
+          }
+          graph.removeItem(node);
+
+          console.log(data.nodes)
+          console.log(data.edges)
+          console.log(dataStructure.nodes);
+        }
+      })
+
+      G6.registerBehavior('click-delete-edge', {
+        getEvents() {
+          return {
+            'edge:click': 'onClick'
+          }
+        },
+        onClick(ev) {
+          const edge = ev.item;
+          const model = edge.getModel();
+          for(let i = 0; i < data.edges.length; i ++) {
+            if(data.edges[i].source == model.source && data.edges[i].target == model.target) {
+              data.edges.splice(i,1);
+            }
+            if(data.edges[i].source == model.target && data.edges[i].target == model.source) {
+              data.edges.splice(i,1);
+            }
+          }
+
+          for(let i = 0; i < dataStructure.nodes.length; i ++) {
+            const node = dataStructure.nodes[i];
+            if(node.id == model.source) {
+              for(let j = 0; j < node.adjList.length; j ++) {
+                if(node.adjList[j] == model.target) {
+                  node.adjList.splice(j,1);
+                }
+              }
+            }
+            if(node.id == model.target) {
+              for(let j = 0; j < node.adjList.length; j ++) {
+                if(node.adjList[j] == model.source) {
+                  node.adjList.splice(j,1);
+                }
+              }
+            }
+          }
+
+          graph.remove(edge);
+        }
+      })
       const graph = new G6.Graph({
         container: `${id}`, // 指定图画布的容器 id，与第 9 行的容器对应
         // 画布宽高
@@ -125,6 +230,8 @@ const G6_render = (data, id, dataStructure) => {
           default:['drag-node', 'click-select'],
           addNode:['click-add-node', 'click-select'],
           addEdge:['click-add-edge', 'click-select'],
+          deleteNode:['click-delete-node', 'click-select'],
+          deleteEdge:['click-delete-edge', 'click-select'],
         },
         defaultNode: {
           size:40,
@@ -140,7 +247,7 @@ const G6_render = (data, id, dataStructure) => {
             startArrow: true,
           },
           color: '#DDD0C8',
-          size:1.5,
+          size:2.5,
         }
       });
 

@@ -9,20 +9,23 @@ export class Graph extends Component {
     input_type = React.createRef();
 
     state = {
-        algorithm_id:'', 
-        algorithm_type:'',
     }
     
     getValue = () => {
         const id = this.input_id.current.value;
         const type = this.input_type.current.value;
-        console.log(id)
-        console.log(type)
-        this.setState({algorithm_id:id,algorithm_type:type})
-        console.log(this.state)
+        let ans = [];
+        if(type === "dfs") {
+            DataGraphStructure.dfs_init(id, ans);
+        }
+        if(type === "bfs") {
+            DataGraphStructure.bfs(id, ans);
+        }
+        console.log(ans)
     }   
     
     render() {
+        console.log(this.state)
         return (
             <div>
                 <br />
@@ -31,6 +34,8 @@ export class Graph extends Component {
                         <option value="default">Drag</option>
                         <option value="addNode">Add Node</option>
                         <option value="addEdge">Add Edge</option>
+                        <option value="deleteNode">Delete Node</option>
+                        <option value="deleteEdge">Delete Edge</option>
                     </select>
                 </div>
                 <div className='col-md-6 UI'>
