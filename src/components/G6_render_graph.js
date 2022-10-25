@@ -1,6 +1,6 @@
 import G6 from '@antv/g6';
 
-const G6_render = (data, id, dataStructure) => {
+const G6_render_graph = (data, id, dataStructure) => {
 
       let nodeCount = data.nodes.length;
       let edgeCount = data.edges.length;
@@ -113,6 +113,7 @@ const G6_render = (data, id, dataStructure) => {
           };
         },
         onClick(ev) {
+          nodeCount++;
           this.graph.addItem('node', {
             x: ev.canvasX,
             y: ev.canvasY,
@@ -127,7 +128,6 @@ const G6_render = (data, id, dataStructure) => {
             label: `${nodeCount}`,
           })
           dataStructure.addNode(nodeCount);
-          nodeCount++;
           console.log(data);
           console.log(dataStructure)
         }
@@ -141,18 +141,15 @@ const G6_render = (data, id, dataStructure) => {
         },
         onClick(ev) {
           const node = ev.item;
+          console.log(graph)
           const model = node.getModel();
-
+          
           for(let i = 0; i < data.nodes.length; i ++) {
             if(model.id == data.nodes[i].id) {
               data.nodes.splice(i,1);
             }
           }
-          for(let i = 0; i < dataStructure.nodes.length; i ++) {
-            if(model.id == dataStructure.nodes[i].id) {
-              dataStructure.nodes.splice(i,1);
-            }
-          }
+          dataStructure.deleteNode(model.id);
           
           for(let i = 0; i < data.edges.length; i ++) {
             if(model.id == data.edges[i].source || model.id == data.edges[i].target) {
@@ -160,6 +157,7 @@ const G6_render = (data, id, dataStructure) => {
               i--;
             }
           }
+
           for(let i = 0; i < dataStructure.nodes.length; i ++) {
             let node = dataStructure.nodes[i];
             if(node.id == model.id) {
@@ -174,10 +172,6 @@ const G6_render = (data, id, dataStructure) => {
             }
           }
           graph.removeItem(node);
-
-          console.log(data.nodes)
-          console.log(data.edges)
-          console.log(dataStructure.nodes);
         }
       })
 
@@ -221,8 +215,7 @@ const G6_render = (data, id, dataStructure) => {
         }
       })
       const graph = new G6.Graph({
-        container: `${id}`, // 指定图画布的容器 id，与第 9 行的容器对应
-        // 画布宽高
+        container: `${id}`, 
         width: 1280,
         height: 960,
         fitViewPadding: [20, 50, 50, 20],
@@ -256,11 +249,14 @@ const G6_render = (data, id, dataStructure) => {
       // 渲染图
       graph.render();
 
+      
+
       document.getElementById('selector').addEventListener('change', e => {
         const value = e.target.value;
         graph.setMode(value);
       })
 
+      return graph;
 }
 
-export default G6_render
+export default G6_render_graph;

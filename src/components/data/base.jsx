@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export class Data extends Component{
+export class Base extends Component{
     state = {
             nodes: [
               ],

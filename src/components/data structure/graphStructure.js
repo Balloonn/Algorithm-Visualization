@@ -19,6 +19,14 @@ export class GraphStructure{
         this.nodes.push(node);
     }
 
+    deleteNode(id) {
+        for(let i = 0; i < this.nodes.length; i ++) {
+            if(id == this.nodes[i].id) {
+              this.nodes.splice(i,1);
+            }
+          }
+    }
+
     addEdge (source_id, target_id, weights) {
         let node0 = null;
         let node1 = null;
@@ -83,21 +91,46 @@ export class GraphStructure{
         }
     }
 
-    // kruskal () {
-    //     let nodes = this.nodes;
-    //     let cnt = 0;
-    //     let p = [];
-    //     for(let i = 0; i < nodes.length; i ++) {
-    //         p[nodes[i].id] = nodes[i].id;
-    //     }
-        
-    // }
+    bipartite(id, ans) {
+        let queue = [];
+        let st = [];
+        let color = [];
+        queue.push(id);
+        color[id] = 1;
+        st[id] = true;
+        ans.push({
+            id:id,
+            color:1,
+        })
 
-    // find (x, p) { 
-    //     if(p[x] !== x) {
-    //         p[x] = find(p[x], p);
-    //     }
-    //     return p[x];
-    // }
+        while(queue.length > 0) {
+            let curid = queue[0];
+            queue.splice(0,1);
+            let node = null;
+            for(let i = 0; i < this.nodes.length; i ++) {
+                if(curid == this.nodes[i].id) {
+                    node = this.nodes[i];
+                }
+            }
+            for(let i = 0; i < node.adjList.length; i ++) {
+                if(!st[node.adjList[i]]) {
+                    st[node.adjList[i]] = true;
+                    queue.push(node.adjList[i]);
+                    color[node.adjList[i]] = 3-color[node.id];
+                    ans.push({
+                        id:node.adjList[i],
+                        color:3-color[node.id],
+                    })
+                }
+                else {
+                    if(color[node.adjList[i]] != 3-color[node.id])
+                        return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    
 }
 
