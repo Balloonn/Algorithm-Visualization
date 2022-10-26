@@ -2,7 +2,6 @@ import G6 from '@antv/g6';
 
 const G6_render_graph = (data, id, dataStructure) => {
 
-      let nodeCount = data.nodes.length;
       let edgeCount = data.edges.length;
 
         G6.registerBehavior('click-add-edge', {
@@ -113,21 +112,20 @@ const G6_render_graph = (data, id, dataStructure) => {
           };
         },
         onClick(ev) {
-          nodeCount++;
-          this.graph.addItem('node', {
-            x: ev.canvasX,
-            y: ev.canvasY,
-            id: `${nodeCount}`, // 生成唯一的 id
-            label: `${nodeCount}`,
-          });
           data.nodes.push({
-            id: `${nodeCount}`,
+            id: `${data.nodes.length+1}`,
             x: ev.canvasX,
             y: ev.canvasY,
             edges: [],
-            label: `${nodeCount}`,
+            label: `${data.nodes.length+1}`,
           })
-          dataStructure.addNode(nodeCount);
+          this.graph.addItem('node', {
+            x: ev.canvasX,
+            y: ev.canvasY,
+            id: `${data.nodes.length}`, // 生成唯一的 id
+            label: `${data.nodes.length}`,
+          });
+          dataStructure.addNode(data.nodes.length);
           console.log(data);
           console.log(dataStructure)
         }
@@ -141,7 +139,6 @@ const G6_render_graph = (data, id, dataStructure) => {
         },
         onClick(ev) {
           const node = ev.item;
-          console.log(graph)
           const model = node.getModel();
           
           for(let i = 0; i < data.nodes.length; i ++) {
@@ -227,7 +224,7 @@ const G6_render_graph = (data, id, dataStructure) => {
           deleteEdge:['click-delete-edge', 'click-select'],
         },
         defaultNode: {
-          size:40,
+          size:50,
           style: {
             fill: '#EAB4C4',
             stroke: '#F3F0E7',

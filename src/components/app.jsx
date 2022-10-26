@@ -5,6 +5,7 @@ import Home from './content/home';
 import { NotFound } from './content/notFound';
 import { Graph } from './content/graph';
 import Stack from './content/stack';
+import ArrList from './content/arrList';
 
 export default class App extends Component {
     state = { }
@@ -17,6 +18,7 @@ export default class App extends Component {
                         <Route path='/algorithm-visualization' element={<Home/>}/>
                         <Route path='/algorithm-visualization/graph' element={<Graph/>}/>
                         <Route path='/algorithm-visualization/stack' element={<Stack/>}/>
+                        <Route path='/algorithm-visualization/arrList' element={<ArrList/>}/>
                         <Route path='/algorithm-visualization/404' element={<NotFound/>}/>
                         <Route path='/algorithm-visualization/*' element={<Navigate replace to="/algorithm-visualization/404"/>}/>
                     </Routes>

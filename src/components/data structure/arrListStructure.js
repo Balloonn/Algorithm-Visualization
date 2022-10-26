@@ -2,12 +2,12 @@
 
 class Node {
     constructor(value) {
-        this.value = value; 
+        this.value = value;
         this.next = null;
     }
 }
 
-export class StackStructure{
+export class ArrListStructure{
     constructor() {
         this.toppos = null;
         this.length = 0;
@@ -20,27 +20,14 @@ export class StackStructure{
         this.length += 1;
     }
 
-    clear() {
-        while(this.size()) {
-            this.pop();
-        }
-    }
-
     pop () {
         this.toppos = this.toppos.next;
         this.length -= 1;
     }
 
     top() {
-        return this.toppos.value;
+        return this.toppos;
     }    
-
-    empty() {
-        if(this.length) {
-            return false;
-        }
-        return true;
-    }
 
     size() {
         return this.length;

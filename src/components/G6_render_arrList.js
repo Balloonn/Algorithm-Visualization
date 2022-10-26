@@ -1,6 +1,6 @@
 import G6 from '@antv/g6';
 
-const G6_render_stack = (data, id, dataStructure) => {
+const G6_render_arrList = (data, id, dataStructure) => {
 
       const graph = new G6.Graph({
         container: `${id}`, 
@@ -32,4 +32,4 @@ const G6_render_stack = (data, id, dataStructure) => {
       return graph;
 }
 
-export default G6_render_stack
+export default G6_render_arrList;

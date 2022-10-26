@@ -33,9 +33,15 @@ export class Graph extends Component {
                 }
             }
         }
+        let buf = '';
+        for(let i = 0; i < ans.length; i ++) {
+            if(i) buf += '->';
+            buf += ans[i];
+        }
+        alert(buf);
     }
 
-    reset = () => {
+    reset_color = () => {
         for(let i = 0; i < DataGraph.state.nodes.length; i ++) {
             let node = DataGraph.state.nodes[i].id;
             const item = this.state.graph.findById(`${node}`);
@@ -50,6 +56,18 @@ export class Graph extends Component {
         }
     }
 
+    reset_value = () => {
+        for(let i = 0; i < DataGraph.state.nodes.length; i ++) {
+            let node = DataGraph.state.nodes[i].id;
+            const item = this.state.graph.findById(`${node}`);
+            this.state.graph.removeItem(item);
+        }
+        DataGraph.state.nodes.splice(0,DataGraph.state.nodes.length);
+        DataGraphStructure.clear();
+        DataGraph.state.edges.splice(0,DataGraph.state.edges.length);
+        DataGraphStructure.nodes.splice(0,DataGraphStructure.nodes.length);
+        
+    }
     async animationBipartite (ans) {
         for(let i = 0; i < ans.length; i ++) {
             let node = ans[i].id;
@@ -99,6 +117,9 @@ export class Graph extends Component {
             if(DataGraphStructure.bipartite(id, ans)) {
                 this.animationBipartite(ans);
             }
+            else {
+                alert("It is not bipartite graph !!");
+            }
         }
     }   
     
@@ -107,13 +128,16 @@ export class Graph extends Component {
             <div>
                 <br />
                 <div className='col-md-5 UI'>
-                    <select className='form-select' id='selector' defaultValue={'default'}>
-                        <option value="default">Drag</option>
-                        <option value="addNode">Add Node</option>
-                        <option value="addEdge">Add Edge</option>
-                        <option value="deleteNode">Delete Node</option>
-                        <option value="deleteEdge">Delete Edge</option>
-                    </select>
+                    <div className="input-group mb-3">
+                        <select className='form-select' id='selector' defaultValue={'default'}>
+                            <option value="default">Drag</option>
+                            <option value="addNode">Add Node</option>
+                            <option value="addEdge">Add Edge</option>
+                            <option value="deleteNode">Delete Node</option>
+                            <option value="deleteEdge">Delete Edge</option>
+                        </select>
+                        <button className="btn btn-outline-secondary" type="button" onClick={() => this.reset_value()}>Clear</button>
+                    </div>
                 </div>
                 <div className='col-md-6 UI'>
                     <div className="input-group mb-3">
@@ -126,7 +150,7 @@ export class Graph extends Component {
                         </div>
                         <input ref={this.input_id} type="text" className="form-control" placeholder='Please input an id'></input>
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.getValue()}>Submit</button>
-                        <button className="btn btn-outline-secondary" type="button" onClick={() => this.reset()}>Reset</button>
+                        <button className="btn btn-outline-secondary" type="button" onClick={() => this.reset_color()}>Reset</button>
                     </div>
                 </div>
                 

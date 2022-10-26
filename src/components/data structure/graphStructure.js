@@ -27,6 +27,10 @@ export class GraphStructure{
           }
     }
 
+    clear() {
+        this.nodes.splice(0,this.nodes.length);
+    }
+
     addEdge (source_id, target_id, weights) {
         let node0 = null;
         let node1 = null;
