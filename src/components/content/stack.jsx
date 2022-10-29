@@ -41,7 +41,7 @@ class Stack extends Component {
     start_algorithm = () => {
         const value = this.algorithm_value.current.value;
         const type = this.algorithm_type.current.value;
-        if(type === "Infix to Postfix") {
+        if(type === "Calculate Infix") {
             let op = new StackStructure();
             let num = new StackStructure();
             let pr = {
@@ -55,7 +55,7 @@ class Stack extends Component {
                     let x = 0;
                     let j = i;
                     while(j<value.length && this.isdigit(value[j])) {
-                        x = x * 10 + value[j] - '0';
+                        x = x * 10 + parseInt(value[j]);
                         j ++;
                     }
                     i = j - 1;
@@ -82,56 +82,56 @@ class Stack extends Component {
             }
             alert(num.top());
         }
-        if(type === "Calculate Postfix") {
-            let op = new StackStructure();
-            let pr = {
-                '+': 1,
-                '-': 1,
-                '*': 2,
-                '/': 2,
-            };
-            let buf = '';
-            for(let i = 0; i < value.length; i ++) {
-                if(this.isdigit(value[i])){
-                    let j = i;
-                    while(j<value.length && this.isdigit(value[j])) {
-                        buf += value[j];
-                        j ++;
-                    }
-                    i = j - 1;
-                }
-                else if(value[i] === '(') {
-                    op.push(value[i]);
-                }
-                else if (value[i] === ')') {
-                    while(op.top() !== '(') {
-                        buf += op.top();
-                        op.pop();
-                    }
-                    op.pop();
-                }
-                else {
-                    if(op.empty()) {
-                        op.push(value[i]);
-                    }
-                    else if(pr[value[i]] < pr[op.top()]) {
-                        while(pr[value[i]] < pr[op.top()]) {
-                            buf += op.top();
-                            op.pop();
-                        }
-                        op.push(value[i]);
-                    }
-                    else {
-                        op.push(value[i]);
-                    }
-                }
-            }
-            while(op.size()) {
-                buf += op.top();
-                op.pop();
-            }
-            alert(buf);
-        }
+        // if(type === "Calculate Postfix") {
+        //     let op = new StackStructure();
+        //     let pr = {
+        //         '+': 1,
+        //         '-': 1,
+        //         '*': 2,
+        //         '/': 2,
+        //     };
+        //     let buf = '';
+        //     for(let i = 0; i < value.length; i ++) {
+        //         if(this.isdigit(value[i])){
+        //             let j = i;
+        //             while(j<value.length && this.isdigit(value[j])) {
+        //                 buf += value[j];
+        //                 j ++;
+        //             }
+        //             i = j - 1;
+        //         }
+        //         else if(value[i] === '(') {
+        //             op.push(value[i]);
+        //         }
+        //         else if (value[i] === ')') {
+        //             while(op.top() !== '(') {
+        //                 buf += op.top();
+        //                 op.pop();
+        //             }
+        //             op.pop();
+        //         }
+        //         else {
+        //             if(op.empty()) {
+        //                 op.push(value[i]);
+        //             }
+        //             else if(pr[value[i]] < pr[op.top()]) {
+        //                 while(pr[value[i]] < pr[op.top()]) {
+        //                     buf += op.top();
+        //                     op.pop();
+        //                 }
+        //                 op.push(value[i]);
+        //             }
+        //             else {
+        //                 op.push(value[i]);
+        //             }
+        //         }
+        //     }
+        //     while(op.size()) {
+        //         buf += op.top();
+        //         op.pop();
+        //     }
+        //     alert(buf);
+        // }
     }
 
     calculate = (num, op) => {
@@ -200,8 +200,6 @@ class Stack extends Component {
         DataStack.state.nodes.splice(0,DataStack.state.nodes.length);
         DataStackStructure.clear();
         DataStack.state.edges.splice(0,DataStack.state.edges.length);
-        DataStackStructure.nodes.splice(0,DataStackStructure.nodes.length);
-        
     }
 
     render() { 
@@ -224,9 +222,9 @@ class Stack extends Component {
                 <div className='col-md-6 UI'>
                     <div className="input-group mb-3">
                         <div className='col-md-4'>
-                            <select ref={this.algorithm_type} className='form-select' id='selector_algorithm' defaultValue={'Infix to Postfix'}>
+                            <select ref={this.algorithm_type} className='form-select' id='selector_algorithm' defaultValue={'Calculate Infix'}>
+                                <option value="Calculate Infix">Calculate Infix</option>
                                 <option value="Infix to Postfix">Infix to Postfix</option>
-                                <option value="Calculate Postfix">Calculate Postfix</option>
                             </select>
                         </div>
                         <input ref={this.algorithm_value} type="text" className="form-control" placeholder='Please input an expression'></input>

@@ -4,4 +4,4 @@ import { Base } from "./base";
 let DataStack = new Base();
 export let DataStackStructure = new StackStructure();
 
-export default DataStack;
+export default {DataStack};
