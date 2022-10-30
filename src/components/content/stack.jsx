@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import G6_render_stack from './../G6_render_stack';
-import { DataStackStructure } from './../data/dataStack';
+import { DataStackStructure, DataOperationStructure } from './../data/dataStack';
 import DataStack from './../data/dataStack';
-import { StackStructure } from '../data structure/stackStructure';
+import { DataOperation } from './../data/dataStack';
+import { sleep } from './../sleep';
 
 class Stack extends Component {
 
@@ -14,7 +15,8 @@ class Stack extends Component {
     state = { 
         graph: {
 
-        }
+        },
+        animationstep: 1000,
      } 
 
     getValue = () => {
@@ -22,28 +24,34 @@ class Stack extends Component {
         const type = this.input_type.current.value;
         
         if(type === "push") {
-            DataStackStructure.push(value);
-            DataStack.state.nodes.push({
-                id: `${DataStackStructure.size()}`,
-                x: (Math.floor((DataStackStructure.size() - 1) / 12) + 1) % 2 ? (((DataStackStructure.size() - 1) % 12 + 1)* 100 - 10):1280-(((DataStackStructure.size() - 1) % 12 + 1)* 100 - 10),
-                y: (Math.floor((DataStackStructure.size() - 1) / 12) + 1) * 100,
-                label: `${value}`,
-            })
-            this.animationPush(value);
+            this.Push(DataStack, DataStackStructure, value);
         }
         if(type === "pop") {
-            this.animationPop();
-            DataStackStructure.pop();
-            DataStack.state.nodes.splice(DataStackStructure.size(),1);
+            this.Pop(DataStack, DataStackStructure);
         }
     }   
 
-    start_algorithm = () => {
+    Push = (Data, DataStructure, value) => {
+        DataStructure.push(value);
+        Data.state.nodes.push({
+            id: `${Data.state.name}_${DataStructure.size()}`,
+            x: (Math.floor((DataStructure.size() - 1) / 12) + 1) % 2 ? (((DataStructure.size() - 1) % 12 + 1)* 100 - 10):1280-(((DataStructure.size() - 1) % 12 + 1)* 100 - 10),
+            y: Data === DataOperation ? 480 + (Math.floor((DataStructure.size() - 1) / 12) + 1) * 100 : (Math.floor((DataStructure.size() - 1) / 12) + 1) * 100,
+            label: `${value}`,
+        })
+        this.animationPush(Data, DataStructure, value);
+    }
+
+    Pop = (Data, DataStructure) => {
+        this.animationPop(Data, DataStructure);
+        DataStructure.pop();
+        Data.state.nodes.splice(DataStructure.size(),1);
+    }
+
+    async start_algorithm () {
         const value = this.algorithm_value.current.value;
         const type = this.algorithm_type.current.value;
         if(type === "Calculate Infix") {
-            let op = new StackStructure();
-            let num = new StackStructure();
             let pr = {
                 '+': 1,
                 '-': 1,
@@ -59,101 +67,100 @@ class Stack extends Component {
                         j ++;
                     }
                     i = j - 1;
-                    num.push(x);
+                    this.Push(DataStack, DataStackStructure, x);
+                    await sleep(this.state.animationstep);
                 }
                 else if(value[i] === '(') {
-                    op.push(value[i]);
+                    this.Push(DataOperation, DataOperationStructure, value[i]);
+                    await sleep(this.state.animationstep);
                 }
                 else if (value[i] === ')') {
-                    while(op.top() !== '(') {
-                        this.calculate(num, op);
+                    this.Push(DataOperation, DataOperationStructure, value[i]); 
+                    await sleep(this.state.animationstep);
+                    this.Pop(DataOperation, DataOperationStructure);
+                    await sleep(this.state.animationstep);
+
+                    while(DataOperationStructure.top() !== '(') {
+                        await this.calculate();
                     }
-                    op.pop();
+                    this.Pop(DataOperation, DataOperationStructure);
+                    await sleep(this.state.animationstep);
                 }
                 else {
-                    while(op.size() && pr[value[i]] <= pr[op.top()]) {
-                        this.calculate(num, op);
+                    while(DataOperationStructure.size() && pr[value[i]] <= pr[DataOperationStructure.top()]) {
+                        await this.calculate();
                     }
-                    op.push(value[i]);
+                    this.Push(DataOperation, DataOperationStructure, value[i]);
+                    await sleep(this.state.animationstep);
                 }
             }
-            while(op.size()) {
-                this.calculate(num, op);
+            while(DataOperationStructure.size()) {
+                await this.calculate();
             }
-            alert(num.top());
+            alert(DataStackStructure.top());
         }
-        // if(type === "Calculate Postfix") {
-        //     let op = new StackStructure();
-        //     let pr = {
-        //         '+': 1,
-        //         '-': 1,
-        //         '*': 2,
-        //         '/': 2,
-        //     };
-        //     let buf = '';
-        //     for(let i = 0; i < value.length; i ++) {
-        //         if(this.isdigit(value[i])){
-        //             let j = i;
-        //             while(j<value.length && this.isdigit(value[j])) {
-        //                 buf += value[j];
-        //                 j ++;
-        //             }
-        //             i = j - 1;
-        //         }
-        //         else if(value[i] === '(') {
-        //             op.push(value[i]);
-        //         }
-        //         else if (value[i] === ')') {
-        //             while(op.top() !== '(') {
-        //                 buf += op.top();
-        //                 op.pop();
-        //             }
-        //             op.pop();
-        //         }
-        //         else {
-        //             if(op.empty()) {
-        //                 op.push(value[i]);
-        //             }
-        //             else if(pr[value[i]] < pr[op.top()]) {
-        //                 while(pr[value[i]] < pr[op.top()]) {
-        //                     buf += op.top();
-        //                     op.pop();
-        //                 }
-        //                 op.push(value[i]);
-        //             }
-        //             else {
-        //                 op.push(value[i]);
-        //             }
-        //         }
-        //     }
-        //     while(op.size()) {
-        //         buf += op.top();
-        //         op.pop();
-        //     }
-        //     alert(buf);
-        // }
+        if(type === "Parentheses Matching") {
+            let valid = true;
+            const map = {
+                ']':'[',
+                '}':'{',
+                ')':'(',
+                '>':'<',
+            }
+            for(let i = 0; i < value.length; i ++) {
+                if(value[i] === '{' || value[i] === '(' || value[i] === '<' || value[i] === '[') {
+                    this.Push(DataOperation, DataOperationStructure, value[i]);
+                    await sleep(this.state.animationstep);
+                }
+                else if(DataOperationStructure.top() !== map[value[i]]) {
+                    break;
+                }
+                else {
+                    this.Push(DataOperation, DataOperationStructure, value[i]);
+                    await sleep(this.state.animationstep);
+                    this.Pop(DataOperation, DataOperationStructure);
+                    await sleep(this.state.animationstep);
+                    this.Pop(DataOperation, DataOperationStructure);
+                    await sleep(this.state.animationstep);
+                }
+            }
+            if(valid) {
+                alert("Valid !!!");
+            }
+            else {
+                alert("Invalid !!!");
+            }
+        }
     }
 
-    calculate = (num, op) => {
-        let b = num.top();
-        num.pop();
-        let a = num.top();
-        num.pop();
+    async calculate() {
+        let b = DataStackStructure.top();
+        this.Pop(DataStack, DataStackStructure)
+        await sleep(this.state.animationstep);
+
+        let a = DataStackStructure.top();
+        this.Pop(DataStack, DataStackStructure)
+        await sleep(this.state.animationstep);
+
         let x = 0;
-        if(op.top() === '+') {
+        if(DataOperationStructure.top() === '+') {
             x=a+b;
         }
-        if(op.top() === '-') {
+        if(DataOperationStructure.top() === '-') {
             x=a-b;
         }
-        if(op.top() === '*') {
+        if(DataOperationStructure.top() === '*') {
             x=a*b;
         }
-        if(op.top() === '/') {
+        if(DataOperationStructure.top() === '/') {
             x=a/b;
         }
-        op.pop();
-        num.push(x);
+
+        this.Pop(DataOperation, DataOperationStructure);
+        await sleep(this.state.animationstep);
+
+        this.Push(DataStack, DataStackStructure, x);
+        await sleep(this.state.animationstep);
     }
 
     isdigit = (value) => {
@@ -163,32 +170,30 @@ class Stack extends Component {
         return false;
     }
 
-    animationPush = (value) => {
+    animationPush = (Data, DataStructure, value) => {   
         this.state.graph.addItem('node',{
-            x:(Math.floor((DataStackStructure.size() - 1) / 12) + 1) % 2 ? (((DataStackStructure.size() - 1) % 12 + 1)* 100 - 10):1280-(((DataStackStructure.size() - 1) % 12 + 1)* 100 - 10),
-            y:(Math.floor((DataStackStructure.size() - 1) / 12) + 1) * 100,
-            id:`${DataStackStructure.size()}`,
+            x:(Math.floor((DataStructure.size() - 1) / 12) + 1) % 2 ? (((DataStructure.size() - 1) % 12 + 1)* 100 - 10):1280-(((DataStructure.size() - 1) % 12 + 1)* 100 - 10),
+            y: Data === DataOperation ? 300 + (Math.floor((DataStructure.size() - 1) / 12) + 1) * 100 : (Math.floor((DataStructure.size() - 1) / 12) + 1) * 100,
+            id:`${Data.state.name}_${DataStructure.size()}`,
             label:value,
         });
-        const source = this.state.graph.findById(`${DataStackStructure.size()}`);
-        const target = this.state.graph.findById(`${DataStackStructure.size() - 1}`);
-        DataStack.state.edges.push({
+        const source = this.state.graph.findById(`${Data.state.name}_${DataStructure.size()}`);
+        const target = this.state.graph.findById(`${Data.state.name}_${DataStructure.size() - 1}`);
+        Data.state.edges.push({
             source: source,
             target: target,
-            id: `edge${DataStackStructure.size() - 1}`,
+            id: `${Data.state.name}_edge${DataStructure.size() - 1}`,
             });
         this.state.graph.addItem('edge', {
             source: source,
             target: target,
-            id: `edge${DataStackStructure.size() - 1}`,
+            id: `${Data.state.name}_edge${DataStructure.size() - 1}`,
         });
     }
 
-    animationPop = () => {
-        const nodes = DataStack.state.nodes;
-        const node = this.state.graph.findById(`${DataStackStructure.size()}`)
+    animationPop = (Data, DataStructure) => {
+        const node = this.state.graph.findById(`${Data.state.name}_${DataStructure.size()}`)
         this.state.graph.removeItem(node);
-        nodes.splice(nodes.length-1,1);
     }
 
     reset_value = () => {
@@ -197,9 +202,18 @@ class Stack extends Component {
             const item = this.state.graph.findById(`${node}`);
             this.state.graph.removeItem(item);
         }
+        for(let i = 0; i < DataOperation.state.nodes.length; i ++) {
+            let node = DataOperation.state.nodes[i].id;
+            const item = this.state.graph.findById(`${node}`);
+            this.state.graph.removeItem(item);
+        }
         DataStack.state.nodes.splice(0,DataStack.state.nodes.length);
         DataStackStructure.clear();
         DataStack.state.edges.splice(0,DataStack.state.edges.length);
+
+        DataOperation.state.nodes.splice(0,DataOperation.state.nodes.length);
+        DataOperationStructure.clear();
+        DataOperation.state.edges.splice(0,DataOperation.state.edges.length);
     }
 
     render() { 
@@ -221,13 +235,13 @@ class Stack extends Component {
                 </div>
                 <div className='col-md-6 UI'>
                     <div className="input-group mb-3">
-                        <div className='col-md-4'>
+                        <div className='col-md-4.5'>
                             <select ref={this.algorithm_type} className='form-select' id='selector_algorithm' defaultValue={'Calculate Infix'}>
                                 <option value="Calculate Infix">Calculate Infix</option>
-                                <option value="Infix to Postfix">Infix to Postfix</option>
+                                <option value="Parentheses Matching">Parentheses Matching</option>
                             </select>
                         </div>
-                        <input ref={this.algorithm_value} type="text" className="form-control" placeholder='Please input an expression'></input>
+                        <input ref={this.algorithm_value} type="text" className="form-control" placeholder='Please input a string'></input>
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.start_algorithm()}>Submit</button>
                     </div>
                 </div>

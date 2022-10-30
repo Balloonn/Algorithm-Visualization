@@ -4,8 +4,14 @@ export class Base extends Component{
     state = {
             nodes: [
               ],
-              // 边集
-              edges: [
+            edges: [
               ],
+            name:'',
+
+    }
+
+    constructor (name) {
+      super();
+      this.state.name = name;
     }
 }

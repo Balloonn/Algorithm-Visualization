@@ -112,22 +112,31 @@ const G6_render_graph = (data, id, dataStructure) => {
           };
         },
         onClick(ev) {
+          let flag = false;
+          let newid = 0;
+          while(!flag) {
+            newid++;
+            flag = true;
+            for(let i = 0; i < data.nodes.length; i ++) {
+              if(data.nodes[i].id == newid) {
+                flag = false;
+              }
+            }
+          }
           data.nodes.push({
-            id: `${data.nodes.length+1}`,
+            id: `${newid}`,
             x: ev.canvasX,
             y: ev.canvasY,
             edges: [],
-            label: `${data.nodes.length+1}`,
+            label: `${newid}`,
           })
           this.graph.addItem('node', {
             x: ev.canvasX,
             y: ev.canvasY,
-            id: `${data.nodes.length}`, // 生成唯一的 id
-            label: `${data.nodes.length}`,
+            id: `${newid}`, 
+            label: `${newid}`,
           });
-          dataStructure.addNode(data.nodes.length);
-          console.log(data);
-          console.log(dataStructure)
+          dataStructure.addNode(newid);
         }
       });
 

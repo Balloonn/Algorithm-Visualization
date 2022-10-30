@@ -9,6 +9,9 @@ export class Graph extends Component {
     input_id = React.createRef();  
     input_type = React.createRef();
 
+    add_items = React.createRef();
+    add_type =  React.createRef();
+
     state = {
         graph:{
 
@@ -122,12 +125,166 @@ export class Graph extends Component {
             }
         }
     }   
+
+    addItems = () => {
+        const items = this.add_items.current.value;
+        const type = this.add_type.current.value;
+        if(type === "Add Nodes") {
+            for(let i = 0; i < items.length; i++) {
+                let buf = '';
+                while(i < items.length && items[i]!=' ') {
+                    buf += items[i];
+                    i++;
+                }
+                DataGraph.state.nodes.push({
+                    id: `${buf}`,
+                    x: 640,
+                    y: 480,
+                    edges: [],
+                    label: `${buf}`,
+                })
+                this.state.graph.addItem('node', {
+                    x: 640,
+                    y: 250,
+                    id: `${buf}`,
+                    label: `${buf}`,
+                });
+                DataGraphStructure.addNode(buf);
+            }
+            this.state.graph.updateLayout({
+                type: 'force',
+                center:[640,300],
+                preventOverlap: true, // 布局参数，是否允许重叠
+                nodeSize: 50, // 布局参数，节点大小，用于判断节点是否重叠
+                linkDistance: 200, // 布局参数，边长
+              });
+        }
+        if(type === "Add Edges") {
+            for(let i = 0; i < items.length; i ++) {
+                let buf = '';
+                while(i < items.length && items[i]!=' ') {
+                    buf += items[i];
+                    i++;
+                }
+                let source = '';
+                let target = '';
+                let j = 0;
+                while(j < buf.length && buf[j]!=',') {
+                    source += buf[j];
+                    j++;
+                }
+                j++;
+                while(j < buf.length) {
+                    target += buf[j];
+                    j++;
+                }
+
+                this.state.graph.addItem('edge', {
+                    source: source,
+                    target: target,
+                    id: `edge${DataGraph.state.edges.length}`,
+                });
+                DataGraph.state.edges.push({
+                    source: source,
+                    target: target,
+                    id: `edge${DataGraph.state.edges.length}`,
+                });
+                DataGraphStructure.addEdge(source,target,1);
+
+                this.state.graph.addItem('edge', {
+                    source: target,
+                    target: source,
+                    id: `edge${DataGraph.state.edges.length}`,
+                });
+                DataGraph.state.edges.push({
+                    source: target,
+                    target: source,
+                    id: `edge${DataGraph.state.edges.length}`,
+                });
+                DataGraphStructure.addEdge(target,source,1);
+            }
+            this.state.graph.updateLayout({
+                type: 'force',
+                center:[640,300],
+                preventOverlap: true, // 布局参数，是否允许重叠
+                nodeSize: 50, // 布局参数，节点大小，用于判断节点是否重叠
+                linkDistance: 200, // 布局参数，边长
+              });
+        }
+        if(type === "Edit Node") {
+            let source = '';
+            let target = '';
+            let j = 0;
+            while(j < items.length && items[j]!=' ') {
+                source += items[j];
+                j++;
+            }
+            j++;
+            while(j < items.length) {
+                target += items[j];
+                j++;
+            }
+            for(let i = 0; i < DataGraph.state.nodes.length; i ++) {
+                if(DataGraph.state.nodes[i].id == source) {
+                    DataGraph.state.nodes[i].id = target;
+                    DataGraph.state.nodes[i].label = target;
+                }
+            }
+
+            for(let i = 0; i < DataGraph.state.edges.length; i ++) {
+                if(DataGraph.state.edges[i].source == source) {
+                    DataGraph.state.edges[i].source = target;
+                }
+                if(DataGraph.state.edges[i].target == source) {
+                    DataGraph.state.edges[i].target = target;
+                }
+            }
+
+            const node = this.state.graph.findById(`${source}`);
+            this.state.graph.updateItem(node,{
+                id:target,
+                label:target,
+            })
+            
+            const data = this.state.graph.save();
+            for(let i = 0; i < data.nodes.length; i ++) {
+                if(data.nodes[i].id == source) {
+                    data.nodes[i].id = target;
+                }
+            }
+            for(let i = 0; i < data.edges.length; i ++) {
+                if(data.edges[i].source == source) {
+                    data.edges[i].source = target;
+                }
+                if(data.edges[i].target == source) {
+                    data.edges[i].target = target;
+                }
+            }
+            
+            this.state.graph.read(data)
+
+            for(let i = 0; i < DataGraphStructure.nodes.length; i ++) {
+                const node = DataGraphStructure.nodes[i];
+                if(node.id == source) {
+                    node.id = target;
+                }
+                else {
+                    for(let j = 0; j < node.adjList.length; j ++) {
+                        if(node.adjList[j] == source) {
+                            node.adjList[j] = target;
+                        }
+                    }
+                }
+            }
+            console.log(this.state.graph)
+        }
+    }
     
     render() {
         return (
             <div>
                 <br />
-                <div className='col-md-5 UI'>
+                <div className='col-md-1.5 UI'>
                     <div className="input-group mb-3">
                         <select className='form-select' id='selector' defaultValue={'default'}>
                             <option value="default">Drag</option>
@@ -139,9 +296,9 @@ export class Graph extends Component {
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.reset_value()}>Clear</button>
                     </div>
                 </div>
-                <div className='col-md-6 UI'>
+                <div className='col-md-3.5 UI'>   
                     <div className="input-group mb-3">
-                        <div className='col-md-3'>
+                        <div className='col-md-2.5'>
                             <select ref={this.input_type} className='form-select' id='selector_algorithm' defaultValue={'dfs'}>
                                 <option value="dfs">dfs</option>
                                 <option value="bfs">bfs</option>
@@ -153,7 +310,19 @@ export class Graph extends Component {
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.reset_color()}>Reset</button>
                     </div>
                 </div>
-                
+                <div className='col-md-4.5 UI'>   
+                    <div className="input-group mb-3">
+                        <div className='col-md-2.5'>
+                            <select ref={this.add_type} className='form-select' id='selector_algorithm' defaultValue={'Add Nodes'}>
+                                <option value="Add Nodes">Add Nodes</option>
+                                <option value="Add Edges">Add Edges</option>
+                                <option value="Edit Node">Edit Node</option>
+                            </select>
+                        </div>
+                        <input ref={this.add_items} type="text" className="form-control" placeholder='Please input a string'></input>
+                        <button className="btn btn-outline-secondary" type="button" onClick={() => this.addItems()}>Submit</button>
+                    </div>
+                </div>
                 <div id="graph_G6"></div>
             </div>
         );
