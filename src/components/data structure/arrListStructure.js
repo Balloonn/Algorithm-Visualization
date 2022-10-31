@@ -1,36 +1,42 @@
 /* eslint-disable */
 
-class Node {
-    constructor(value) {
-        this.value = value;
-        this.next = null;
-    }
-}
 
 export class ArrListStructure{
     constructor() {
-        this.toppos = null;
-        this.length = 0;
+        this.arrList = [];
     };
 
-    push (value) {
-        const node = new Node(value);    
-        node.next = this.toppos;
-        this.toppos = node;
-        this.length += 1;
+    insert(pos, value) {
+        if(!this.arrList[pos]) {
+            this.arrList[pos] = value;
+        }
+        else {
+            for(let i = this.arrList.length; i >= pos; i --) {
+                this.arrList[i] = this.arrList[i-1];
+            }
+            this.arrList[pos] = value;
+        }
     }
 
-    pop () {
-        this.toppos = this.toppos.next;
-        this.length -= 1;
+    delete(pos) {
+        for(let i = pos; i + 1 < this.arrList.length; i ++) {
+            this.arrList[i] = this.arrList[i+1];
+        }
+        this.arrList.splice(this.arrList.length-1,1);
     }
 
-    top() {
-        return this.toppos;
-    }    
+    edit(pos, value) {
+        this.arrList[pos] = value;
+    }
 
-    size() {
-        return this.length;
+    swap(pos1, pos2) {
+        const value = this.arrList[pos1];
+        this.arrList[pos1] = this.arrList[pos2];
+        this.arrList[pos2] = value;
+    }
+
+    clear() {
+        this.arrList.splice(0, this.arrList.length)
     }
 }
 

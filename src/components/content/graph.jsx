@@ -69,8 +69,9 @@ export class Graph extends Component {
         DataGraphStructure.clear();
         DataGraph.state.edges.splice(0,DataGraph.state.edges.length);
         DataGraphStructure.nodes.splice(0,DataGraphStructure.nodes.length);
-        
+        this.update_adjlist();
     }
+    
     async animationBipartite (ans) {
         for(let i = 0; i < ans.length; i ++) {
             let node = ans[i].id;
@@ -102,6 +103,7 @@ export class Graph extends Component {
                 }
             }
         }
+        alert("Finish")
     }
 
     getValue = () => {
@@ -276,10 +278,35 @@ export class Graph extends Component {
                     }
                 }
             }
-            console.log(this.state.graph)
         }
+        this.update_adjlist();
     }
     
+    update_adjlist = () => {
+        let adjlist = document.getElementById('adjlist');
+        let text = '';
+        for(let i = 0; i < DataGraphStructure.nodes.length; i ++) {
+            const node = DataGraphStructure.nodes[i];
+            text += node.id;
+            for(let j = 0; j < node.adjList.length; j ++) {
+                text += '->';
+                text += node.adjList[j];
+            }
+            text += '\n'
+        }
+        adjlist.innerText = text;
+    }
+
+    AdjList_show_hide = () => {
+        let adjlist = document.getElementById('adjlist');
+        if(adjlist.style.display == 'none') {
+            adjlist.style.display = 'block'
+        }
+        else if(adjlist.style.display == 'block') {
+            adjlist.style.display = 'none'
+        }
+    }
+
     render() {
         return (
             <div>
@@ -321,9 +348,13 @@ export class Graph extends Component {
                         </div>
                         <input ref={this.add_items} type="text" className="form-control" placeholder='Please input a string'></input>
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.addItems()}>Submit</button>
+                        <button className="btn btn-outline-secondary" type="button" onClick={() => this.AdjList_show_hide()}>AdjList</button>
                     </div>
                 </div>
-                <div id="graph_G6"></div>
+                <br />
+                <br />
+                <div style={{zIndex:1, width:'300px', float:'right', boxShadow: '5px 5px 2px #888888', borderStyle:'ridge', borderRadius:'1px', display:'none'}} id='adjlist'></div>
+                <div id="graph_G6" style={{position:'absolute'}}></div>
             </div>
         );
     }

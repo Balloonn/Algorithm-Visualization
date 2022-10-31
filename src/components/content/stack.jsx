@@ -24,7 +24,14 @@ class Stack extends Component {
         const type = this.input_type.current.value;
         
         if(type === "push") {
-            this.Push(DataStack, DataStackStructure, value);
+            for(let i = 0; i < value.length; i ++) {
+                let buf = '';
+                while(i < value.length && value[i]!=' ') {
+                    buf += value[i];
+                    i++;
+                }
+                this.Push(DataStack, DataStackStructure, buf);
+            }
         }
         if(type === "pop") {
             this.Pop(DataStack, DataStackStructure);
@@ -48,7 +55,7 @@ class Stack extends Component {
         Data.state.nodes.splice(DataStructure.size(),1);
     }
 
-    async start_algorithm () {
+            async start_algorithm () {
         const value = this.algorithm_value.current.value;
         const type = this.algorithm_type.current.value;
         if(type === "Calculate Infix") {
@@ -123,6 +130,9 @@ class Stack extends Component {
                     this.Pop(DataOperation, DataOperationStructure);
                     await sleep(this.state.animationstep);
                 }
+            }
+            if(DataOperationStructure.size()) {
+                valid = false;
             }
             if(valid) {
                 alert("Valid !!!");
@@ -246,6 +256,8 @@ class Stack extends Component {
                     </div>
                 </div>
                 <div id="stack_G6"></div>
+
+                
             </div>
         );
     }
