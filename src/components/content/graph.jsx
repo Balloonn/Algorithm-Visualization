@@ -3,6 +3,7 @@ import DataGraph from './../data/dataGraph';
 import { DataGraphStructure } from './../data/dataGraph';
 import { sleep } from './../sleep';
 import G6_render_graph from './../G6_render_graph';
+import { data } from 'jquery';
 
 export class Graph extends Component {
 
@@ -128,7 +129,7 @@ export class Graph extends Component {
         }
     }   
 
-    addItems = () => {
+    async addItems (){
         const items = this.add_items.current.value;
         const type = this.add_type.current.value;
         if(type === "Add Nodes") {
@@ -160,6 +161,7 @@ export class Graph extends Component {
                 nodeSize: 50, // 布局参数，节点大小，用于判断节点是否重叠
                 linkDistance: 200, // 布局参数，边长
               });
+            await sleep(500)
         }
         if(type === "Add Edges") {
             for(let i = 0; i < items.length; i ++) {
@@ -212,6 +214,7 @@ export class Graph extends Component {
                 nodeSize: 50, // 布局参数，节点大小，用于判断节点是否重叠
                 linkDistance: 200, // 布局参数，边长
               });
+              await sleep(500)
         }
         if(type === "Edit Node") {
             let source = '';
@@ -278,6 +281,16 @@ export class Graph extends Component {
                     }
                 }
             }
+        }
+        for(let i = 0; i < DataGraph.state.nodes.length; i ++) {
+            const id = DataGraph.state.nodes[i].id;
+            const node = this.state.graph.findById(id);
+            const model = node.getModel();
+            console.log(model);
+            console.log(model.x)
+            DataGraph.state.nodes[i].x = model.x;
+            DataGraph.state.nodes[i].y = model.y;
+            console.log(DataGraph.state.nodes[i])
         }
         this.update_adjlist();
     }

@@ -9,6 +9,7 @@ const G6_render_arrList = (data, id, dataStructure) => {
         fitViewPadding: [20, 50, 50, 20],
         defaultNode: {
           size:60,
+          type:'rect',
           style: {
             fill: '#EAB4C4',
             stroke: '#F3F0E7',
