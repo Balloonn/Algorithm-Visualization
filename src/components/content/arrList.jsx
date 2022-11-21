@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import G6_render_arrList from '../G6_render_arrList';
 import { DataArrListStructure } from './../data/dataArrList';
 import DataArrList from './../data/dataArrList';
-import { sleep } from './../sleep';
+import { sleep } from '../utils/sleep';
 
 class ArrList extends Component {
     input_position = React.createRef();
@@ -18,13 +18,43 @@ class ArrList extends Component {
         animationstep: 1000,
      } 
 
+    updatePlaceholder_value = () => {
+        let input = document.getElementById('input_value');
+        const type = this.input_type.current.value;
+        if(type === "delete") {
+            input.placeholder = 'Do not input a value'
+        }
+        else {
+            input.placeholder = 'Please input a value'
+        }
+    }
+
+    updatePlaceholder_algorithm = () => {
+        let input = document.getElementById('algorithm_value');
+        const type = this.algorithm_type.current.value;
+        if(type === "Bubble Sort") {
+            input.placeholder = 'Do not input a value'
+        }
+        else {
+            input.placeholder = 'Please input a value'
+        }
+    }
+
     getValue = () => {
         const type = this.input_type.current.value;
-        const position = this.input_position.current.value;
+        let position = this.input_position.current.value;
 
         if(type === "insert") {
             const value = this.input_value.current.value;
-            this.insert(DataArrList, DataArrListStructure, position, value)
+            for(let i = 0; i < value.length; i ++) {
+                let buf = '';
+                while(i < value.length && value[i]!=' ') {
+                    buf += value[i];
+                    i++;
+                }
+                this.insert(DataArrList, DataArrListStructure, position, buf);
+                position ++;
+            }
         }
         if(type === "delete") {
             this.delete(DataArrList, DataArrListStructure, position)
@@ -61,7 +91,6 @@ class ArrList extends Component {
         }
         
         for(let i = 0; i < Data.state.nodes.length; i ++) {
-            console.log(Data.state.nodes[i])
             Data.state.nodes[i] = {
                 id: `${i}`,
                 x: (i % 12 + 1)* 100 - 10,
@@ -238,7 +267,12 @@ class ArrList extends Component {
         this.state.graph.removeItem(nodel);
         this.state.graph.removeItem(noder);
         this.state.graph.removeItem(nodemid);
-        alert(r);
+        if(DataStructure.arrList[r] == value) {
+            alert(r);
+        }
+        else {
+            alert("Fail to find "+value);
+        }
     }
 
     reset_value = () => {
@@ -257,14 +291,14 @@ class ArrList extends Component {
                 <div className='col-md-6 UI'>
                     <div className="input-group mb-3">
                         <div className='col-md-2'>
-                            <select ref={this.input_type} className='form-select' id='selector_algorithm' defaultValue={'insert'}>
+                            <select ref={this.input_type} className='form-select' id='selector_algorithm' defaultValue={'insert'} onChange={() => this.updatePlaceholder_value()}>
                                 <option value="insert">insert</option>
                                 <option value="delete">delete</option>
                                 <option value="edit">edit</option>
                             </select>
                         </div>
-                        <input ref={this.input_value} type="text" className="form-control" placeholder='Please input a value'></input>
-                        <input ref={this.input_position} type="text" className="form-control" placeholder='Please input a position'></input>
+                        <input ref={this.input_value} type="text" className="form-control" placeholder='Please input a value' id='input_value'></input>
+                        <input ref={this.input_position} type="text" className="form-control" placeholder='Please input a position' id='input_position'></input>
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.getValue()}>Submit</button>
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.reset_value()}>Clear</button>
                     </div>
@@ -272,12 +306,12 @@ class ArrList extends Component {
                 <div className='col-md-5 UI'>
                     <div className="input-group mb-3">
                         <div className='col-md-4.5'>
-                            <select ref={this.algorithm_type} className='form-select' id='selector_algorithm' defaultValue={'Calculate Infix'}>
+                            <select ref={this.algorithm_type} className='form-select' id='selector_algorithm' defaultValue={'Calculate Infix'} onChange={() => this.updatePlaceholder_algorithm()}>
                                 <option value="Bubble Sort">Bubble Sort</option>
                                 <option value="Binary Search">Binary Search</option>
                             </select>
                         </div>
-                        <input ref={this.algorithm_value} type="text" className="form-control" placeholder='Please input a value'></input>
+                        <input ref={this.algorithm_value} type="text" className="form-control" placeholder='Do not input a value' id='algorithm_value'></input>
                         <button className="btn btn-outline-secondary" type="button" onClick={() => this.start_algorithm()}>Submit</button>
                     </div>
                 </div>

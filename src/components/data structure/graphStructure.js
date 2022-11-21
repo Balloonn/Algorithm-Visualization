@@ -25,10 +25,15 @@ export class GraphStructure{
               this.nodes.splice(i,1);
             }
           }
-    }
-
-    clear() {
-        this.nodes.splice(0,this.nodes.length);
+        for(let i = 0; i < this.nodes.length; i ++) {
+            let node = this.nodes[i];
+            for(let j=0;j<node.adjList.length;j++) {
+                if(node.adjList[j] == id) {
+                    node.adjList.splice(j,1);
+                  }
+            }
+            
+        }
     }
 
     addEdge (source_id, target_id, weights) {
@@ -46,6 +51,10 @@ export class GraphStructure{
             node0.adjList.push(node1.id);
             node0.weights.push(weights);
         }
+    }
+
+    clear() {
+        this.nodes.splice(0,this.nodes.length);
     }
 
     dfs_init (id, ans) {
@@ -134,6 +143,53 @@ export class GraphStructure{
         }
 
         return true;
+    }
+
+    topologicalSort() {
+        let id = [];
+        let q = [];
+        let ans = [];
+        let nodes = this.nodes;
+        for(let i=0;i<nodes.length;i++) {
+            id[nodes[i].id] = 0;
+        }
+        for(let i = 0; i < nodes.length; i ++) {
+            const node = nodes[i];
+            for(let j = 0; j < node.adjList.length; j ++) {
+                id[node.adjList[j]] ++;
+            }
+        }
+        for(let i = 0; i < nodes.length; i ++) {
+            const node = nodes[i];
+            if(id[node.id] == 0) {
+                q.push(node.id);
+                ans.push(node.id);
+            }
+        }
+        while(q.length) {
+            const node_id = q[0];
+            let node = null;
+            for(let i=0;i<nodes.length;i++) 
+            {   
+                if(node_id == nodes[i].id) {
+                    node = nodes[i];
+                }
+            }
+            q.splice(0,1);
+            for(let i=0;i<node.adjList.length;i++) {
+                id[node.adjList[i]] --;
+                if(id[node.adjList[i]] == 0) {
+                    q.push(node.adjList[i]);
+                    ans.push(node.adjList[i]);
+                }
+            }
+        }
+        if(ans.length == nodes.length) {
+            return ans;
+        }
+        else {
+            return [];
+        }
     }
     
 }

@@ -3,7 +3,7 @@ import G6_render_stack from './../G6_render_stack';
 import { DataStackStructure, DataOperationStructure } from './../data/dataStack';
 import DataStack from './../data/dataStack';
 import { DataOperation } from './../data/dataStack';
-import { sleep } from './../sleep';
+import { sleep } from '../utils/sleep';
 
 class Stack extends Component {
 
@@ -55,11 +55,8 @@ class Stack extends Component {
         Data.state.nodes.splice(DataStructure.size(),1);
     }
 
-            async start_algorithm () {
-        const value = this.algorithm_value.current.value;
-        const type = this.algorithm_type.current.value;
-        if(type === "Calculate Infix") {
-            let pr = {
+    async calculateInfix(value) {
+        let pr = {
                 '+': 1,
                 '-': 1,
                 '*': 2,
@@ -105,9 +102,10 @@ class Stack extends Component {
                 await this.calculate();
             }
             alert(DataStackStructure.top());
-        }
-        if(type === "Parentheses Matching") {
-            let valid = true;
+    }
+
+    async parenthesesMatching(value) {
+        let valid = true;
             const map = {
                 ']':'[',
                 '}':'{',
@@ -140,6 +138,16 @@ class Stack extends Component {
             else {
                 alert("Invalid !!!");
             }
+    }
+
+    async start_algorithm () {
+        const value = this.algorithm_value.current.value;
+        const type = this.algorithm_type.current.value;
+        if(type === "Calculate Infix") {
+            this.calculateInfix(value);
+        }
+        if(type === "Parentheses Matching") {
+            this.parenthesesMatching(value);
         }
     }
 

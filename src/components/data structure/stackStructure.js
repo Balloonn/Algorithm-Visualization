@@ -20,18 +20,14 @@ export class StackStructure{
         this.length += 1;
     }
 
-    clear() {
-        while(this.size()) {
-            this.pop();
-        }
-    }
-
     pop () {
+        if(this.length == 0) return false;
         this.toppos = this.toppos.next;
         this.length -= 1;
     }
 
     top() {
+        if(this.length == 0) return false;
         return this.toppos.value;
     }    
 
@@ -45,5 +41,12 @@ export class StackStructure{
     size() {
         return this.length;
     }
+    
+    clear() {
+        while(this.size()) {
+            this.pop();
+        }
+    }
+
 }
 

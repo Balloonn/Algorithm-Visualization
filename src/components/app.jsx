@@ -15,12 +15,12 @@ export default class App extends Component {
                 <NavBar/>
                 <div className='container'>
                     <Routes>
-                        <Route path='/algorithm-visualization' element={<Home/>}/>
-                        <Route path='/algorithm-visualization/graph' element={<Graph/>}/>
-                        <Route path='/algorithm-visualization/stack' element={<Stack/>}/>
-                        <Route path='/algorithm-visualization/arrList' element={<ArrList/>}/>
-                        <Route path='/algorithm-visualization/404' element={<NotFound/>}/>
-                        <Route path='/algorithm-visualization/*' element={<Navigate replace to="/algorithm-visualization/404"/>}/>
+                        <Route path='/' element={<Home/>}/>
+                        <Route path='/graph' element={<Graph/>}/>
+                        <Route path='/stack' element={<Stack/>}/>
+                        <Route path='/arrList' element={<ArrList/>}/>
+                        <Route path='/404' element={<NotFound/>}/>
+                        <Route path='/*' element={<Navigate replace to="/404"/>}/>
                     </Routes>
                 </div>
             </React.Fragment>

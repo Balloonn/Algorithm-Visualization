@@ -27,7 +27,7 @@ export default class Home extends Component {
                     <div className="card-body">
                         <h5 className="card-title">ArrList</h5>
                         <p className="card-text">顺序表实现了基本的插入、删除与修改功能，并且支持冒泡排序或二分查找两类算法的应用，同时存在相应的动画演示。</p>
-                        <Link className="nav-link btn btn-primary" to="/algorithm-visualization/arrList" style={{color:'white', height:'40px', alignItems:'center',textAlign:'center',display:'flex',justifyContent:'center'}}>Goto ArrList</Link>
+                        <Link className="nav-link btn btn-primary" to="/arrList" style={{color:'white', height:'40px', alignItems:'center',textAlign:'center',display:'flex',justifyContent:'center'}}>Goto ArrList</Link>
                     </div>
                 </div>
                 <div className="card" style={{width: "18rem",float:'left',marginLeft:'158px'}}>
@@ -35,7 +35,7 @@ export default class Home extends Component {
                     <div className="card-body">
                         <h5 className="card-title">Stack</h5>
                         <p className="card-text">链式栈实现了基本的压入与弹出功能，并且支持中缀表达式的求值与括号匹配两类算法的应用，同时存在相应的动画演示。</p>
-                        <Link className="nav-link btn btn-primary" to="/algorithm-visualization/stack" style={{color:'white', height:'40px', alignItems:'center',textAlign:'center',display:'flex',justifyContent:'center'}}>Goto Stack</Link>
+                        <Link className="nav-link btn btn-primary" to="/stack" style={{color:'white', height:'40px', alignItems:'center',textAlign:'center',display:'flex',justifyContent:'center'}}>Goto Stack</Link>
                     </div>
                 </div>
                 <div className="card" style={{width: "18rem",float:'left',marginLeft:'158px'}}>
@@ -43,7 +43,7 @@ export default class Home extends Component {
                     <div className="card-body">
                         <h5 className="card-title">Graph</h5>
                         <p className="card-text">无向图实现了基本的增加、删除、拖拽点与边的功能，并且支持搜索和判断二分图两类算法的应用，同时存在相应的动画演示。</p>
-                        <Link className="nav-link btn btn-primary" to="/algorithm-visualization/graph" style={{color:'white', height:'40px', alignItems:'center',textAlign:'center',display:'flex',justifyContent:'center'}}>Goto Graph</Link>
+                        <Link className="nav-link btn btn-primary" to="/graph" style={{color:'white', height:'40px', alignItems:'center',textAlign:'center',display:'flex',justifyContent:'center'}}>Goto Graph</Link>
                     </div>
                 </div>
             </Base>

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import DataGraph from './../data/dataGraph';
 import { DataGraphStructure } from './../data/dataGraph';
-import { sleep } from './../sleep';
+import { sleep } from '../utils/sleep';
 import G6_render_graph from './../G6_render_graph';
-import { data } from 'jquery';
+import update_adjlist from '../utils/utils'
 
 export class Graph extends Component {
 
@@ -17,6 +17,7 @@ export class Graph extends Component {
         graph:{
 
         },
+        animationstep: 1000,
     }
     
     async animationSearch (ans){
@@ -33,7 +34,7 @@ export class Graph extends Component {
                           },
                     }
                     this.state.graph.updateItem(item, model);
-                    await sleep(1000);
+                    await sleep(this.state.animationstep);
                 }
             }
         }
@@ -70,7 +71,7 @@ export class Graph extends Component {
         DataGraphStructure.clear();
         DataGraph.state.edges.splice(0,DataGraph.state.edges.length);
         DataGraphStructure.nodes.splice(0,DataGraphStructure.nodes.length);
-        this.update_adjlist();
+        update_adjlist();
     }
     
     async animationBipartite (ans) {
@@ -100,11 +101,35 @@ export class Graph extends Component {
                     if(color == 2) {
                         this.state.graph.updateItem(item, model2);
                     }
-                    await sleep(1000);
+                    await sleep(this.state.animationstep);
                 }
             }
         }
         alert("Finish")
+    }
+
+    async animationTopologicalSort (ans) {
+        for(let i=0;i<DataGraph.state.nodes.length;i++) {
+            let node_id = DataGraph.state.nodes[i].id;
+            let node = this.state.graph.findById(node_id);
+            let model = node.getModel();
+            DataGraph.state.nodes[i].x = model.x;
+            DataGraph.state.nodes[i].y = model.y;
+        }
+        let buf = '';
+        for(let i=0;i<ans.length;i++) {
+            if(!i) {
+                buf += ans[i];
+            }
+            else {
+                buf += "->" + ans[i];
+            }
+            const node = this.state.graph.findById(`${ans[i]}`);
+            this.state.graph.removeItem(node);
+            await sleep(this.state.animationstep);
+        }
+        alert(buf);
+        this.state.graph.read(DataGraph.state);
     }
 
     getValue = () => {
@@ -127,12 +152,22 @@ export class Graph extends Component {
                 alert("It is not bipartite graph !!");
             }
         }
+        if(type === "topologicalSort") {
+            let ans = DataGraphStructure.topologicalSort();
+            if(ans.length != 0) {
+                this.animationTopologicalSort(ans);
+            }
+            else {
+                alert("This graph can not do topological sort !!!")
+            }
+        }
     }   
 
     async addItems (){
         const items = this.add_items.current.value;
         const type = this.add_type.current.value;
         if(type === "Add Nodes") {
+            let tmp = [];
             for(let i = 0; i < items.length; i++) {
                 let buf = '';
                 while(i < items.length && items[i]!=' ') {
@@ -146,6 +181,7 @@ export class Graph extends Component {
                     edges: [],
                     label: `${buf}`,
                 })
+                tmp.push(buf);
                 this.state.graph.addItem('node', {
                     x: 640,
                     y: 250,
@@ -161,9 +197,12 @@ export class Graph extends Component {
                 nodeSize: 50, // 布局参数，节点大小，用于判断节点是否重叠
                 linkDistance: 200, // 布局参数，边长
               });
-            await sleep(500)
+            await sleep(this.state.animationstep/2)
+            this.state.graph.updateLayout({
+                type: '',
+              });
         }
-        if(type === "Add Edges") {
+        if(type === "Add U_Edges") {
             for(let i = 0; i < items.length; i ++) {
                 let buf = '';
                 while(i < items.length && items[i]!=' ') {
@@ -186,24 +225,24 @@ export class Graph extends Component {
                 this.state.graph.addItem('edge', {
                     source: source,
                     target: target,
-                    id: `edge${DataGraph.state.edges.length}`,
+                    id: `_edge${DataGraph.state.edges.length}`,
                 });
                 DataGraph.state.edges.push({
                     source: source,
                     target: target,
-                    id: `edge${DataGraph.state.edges.length}`,
+                    id: `_edge${DataGraph.state.edges.length}`,
                 });
                 DataGraphStructure.addEdge(source,target,1);
 
                 this.state.graph.addItem('edge', {
                     source: target,
                     target: source,
-                    id: `edge${DataGraph.state.edges.length}`,
+                    id: `_edge${DataGraph.state.edges.length}`,
                 });
                 DataGraph.state.edges.push({
                     source: target,
                     target: source,
-                    id: `edge${DataGraph.state.edges.length}`,
+                    id: `_edge${DataGraph.state.edges.length}`,
                 });
                 DataGraphStructure.addEdge(target,source,1);
             }
@@ -214,7 +253,54 @@ export class Graph extends Component {
                 nodeSize: 50, // 布局参数，节点大小，用于判断节点是否重叠
                 linkDistance: 200, // 布局参数，边长
               });
-              await sleep(500)
+              await sleep(this.state.animationstep/2)
+              this.state.graph.updateLayout({
+                type: '',
+              });
+        }
+        if(type === "Add D_Edges") {
+            for(let i = 0; i < items.length; i ++) {
+                let buf = '';
+                while(i < items.length && items[i]!=' ') {
+                    buf += items[i];
+                    i++;
+                }
+                let source = '';
+                let target = '';
+                let j = 0;
+                while(j < buf.length && buf[j]!=',') {
+                    source += buf[j];
+                    j++;
+                }
+                j++;
+                while(j < buf.length) {
+                    target += buf[j];
+                    j++;
+                }
+
+                this.state.graph.addItem('edge', {
+                    source: source,
+                    target: target,
+                    id: `_edge${DataGraph.state.edges.length}`,
+                });
+                DataGraph.state.edges.push({
+                    source: source,
+                    target: target,
+                    id: `_edge${DataGraph.state.edges.length}`,
+                });
+                DataGraphStructure.addEdge(source,target,1);
+            }
+            this.state.graph.updateLayout({
+                type: 'force',
+                center:[640,300],
+                preventOverlap: true, // 布局参数，是否允许重叠
+                nodeSize: 50, // 布局参数，节点大小，用于判断节点是否重叠
+                linkDistance: 200, // 布局参数，边长
+              });
+              await sleep(this.state.animationstep/2)
+              this.state.graph.updateLayout({
+                type: '',
+              });
         }
         if(type === "Edit Node") {
             let source = '';
@@ -286,28 +372,10 @@ export class Graph extends Component {
             const id = DataGraph.state.nodes[i].id;
             const node = this.state.graph.findById(id);
             const model = node.getModel();
-            console.log(model);
-            console.log(model.x)
             DataGraph.state.nodes[i].x = model.x;
             DataGraph.state.nodes[i].y = model.y;
-            console.log(DataGraph.state.nodes[i])
         }
-        this.update_adjlist();
-    }
-    
-    update_adjlist = () => {
-        let adjlist = document.getElementById('adjlist');
-        let text = '';
-        for(let i = 0; i < DataGraphStructure.nodes.length; i ++) {
-            const node = DataGraphStructure.nodes[i];
-            text += node.id;
-            for(let j = 0; j < node.adjList.length; j ++) {
-                text += '->';
-                text += node.adjList[j];
-            }
-            text += '\n'
-        }
-        adjlist.innerText = text;
+        update_adjlist();
     }
 
     AdjList_show_hide = () => {
@@ -329,7 +397,8 @@ export class Graph extends Component {
                         <select className='form-select' id='selector' defaultValue={'default'}>
                             <option value="default">Drag</option>
                             <option value="addNode">Add Node</option>
-                            <option value="addEdge">Add Edge</option>
+                            <option value="addEdge1">Add Edge1</option>
+                            <option value="addEdge2">Add Edge2</option>
                             <option value="deleteNode">Delete Node</option>
                             <option value="deleteEdge">Delete Edge</option>
                         </select>
@@ -343,6 +412,7 @@ export class Graph extends Component {
                                 <option value="dfs">dfs</option>
                                 <option value="bfs">bfs</option>
                                 <option value="bipartite">bipartite</option>
+                                <option value="topologicalSort">topo</option>
                             </select>
                         </div>
                         <input ref={this.input_id} type="text" className="form-control" placeholder='Please input an id'></input>
@@ -355,7 +425,8 @@ export class Graph extends Component {
                         <div className='col-md-2.5'>
                             <select ref={this.add_type} className='form-select' id='selector_algorithm' defaultValue={'Add Nodes'}>
                                 <option value="Add Nodes">Add Nodes</option>
-                                <option value="Add Edges">Add Edges</option>
+                                <option value="Add D_Edges">Add Edges1</option>
+                                <option value="Add U_Edges">Add Edges2</option>
                                 <option value="Edit Node">Edit Node</option>
                             </select>
                         </div>
